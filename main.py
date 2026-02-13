@@ -1,7 +1,28 @@
 import time
 import random
 import csv
+import os
 from datetime import datetime
+
+# Colored output for terminal
+class Colors:
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    RESET = '\033[0m'
+    BOLD = '\033[1m'
+
+def get_status_color(status):
+    """Return color based on status"""
+    if status == "DANGER":
+        return Colors.RED + Colors.BOLD
+    elif status == "WARNING":
+        return Colors.YELLOW + Colors.BOLD
+    else:
+        return Colors.GREEN + Colors.BOLD
 
 # -------------------------------
 # Digital Twin (All Sensors)
@@ -26,7 +47,9 @@ history = {
     "humidity": []
 }
 
-print("\nVirtuSafe+ Backend Started...\n")
+print(f"\n{Colors.CYAN}{Colors.BOLD}╔════════════════════════════════════╗{Colors.RESET}")
+print(f"{Colors.CYAN}{Colors.BOLD}║    🛡️  VirtuSafe+ Backend Started   ║{Colors.RESET}")
+print(f"{Colors.CYAN}{Colors.BOLD}╚════════════════════════════════════╝{Colors.RESET}\n")
 
 # -------------------------------
 # AI Risk Engine
@@ -85,7 +108,9 @@ with open("data_log.csv", "w", newline="") as file:
 # -------------------------------
 # Real-Time Loop
 # -------------------------------
+counter = 0
 while True:
+    counter += 1
 
     # Simulate Sensors
     digital_twin["temperature"] += random.uniform(-0.5, 2.0)
@@ -115,23 +140,26 @@ while True:
     timestamp = datetime.now().strftime("%H:%M:%S")
 
 
-    # Terminal Output
-    print(f"⏱ {timestamp}")
+    # Animated Terminal Output
+    print(f"\n{Colors.BOLD}{'='*60}{Colors.RESET}")
+    print(f"{Colors.HEADER}{Colors.BOLD}📊 VirtuSafe+ Monitoring - Cycle #{counter}{Colors.RESET}")
+    print(f"{Colors.BOLD}⏱ Time: {Colors.CYAN}{timestamp}{Colors.RESET}")
+    print(f"{Colors.BOLD}{'='*60}{Colors.RESET}\n")
 
-    print(f"🌡 Temp: {digital_twin['temperature']:.2f} °C")
-    print(f"💨 Smoke: {digital_twin['smoke']:.2f}")
-    print(f"⚡ Power: {digital_twin['power']:.2f} kW")
-    print(f"🌫 Gas: {digital_twin['gas']:.2f} %")
-    print(f"💨 CO2: {digital_twin['co2']:.0f} ppm")
-    print(f"💧 Water Leak: {digital_twin['water_leak']}")
-    print(f"🚶 Motion: {digital_twin['motion']}")
-    print(f"💦 Humidity: {digital_twin['humidity']:.1f} %")
+    print(f"{Colors.BLUE}🌡 Temperature:{Colors.RESET} {Colors.YELLOW}{digital_twin['temperature']:.2f}°C{Colors.RESET}")
+    print(f"{Colors.BLUE}💨 Smoke Level:{Colors.RESET} {Colors.YELLOW}{digital_twin['smoke']:.2f}{Colors.RESET}")
+    print(f"{Colors.BLUE}⚡ Power Usage:{Colors.RESET} {Colors.YELLOW}{digital_twin['power']:.2f} kW{Colors.RESET}")
+    print(f"{Colors.BLUE}🌫 Gas Level:{Colors.RESET} {Colors.YELLOW}{digital_twin['gas']:.2f}%{Colors.RESET}")
+    print(f"{Colors.BLUE}💨 CO2 Level:{Colors.RESET} {Colors.YELLOW}{digital_twin['co2']:.0f} ppm{Colors.RESET}")
+    print(f"{Colors.BLUE}💧 Water Leak:{Colors.RESET} {Colors.RED if digital_twin['water_leak'] == 1 else Colors.GREEN}{'🚨 YES' if digital_twin['water_leak'] == 1 else '✓ NO'}{Colors.RESET}")
+    print(f"{Colors.BLUE}🚶 Motion:{Colors.RESET} {Colors.RED if digital_twin['motion'] == 1 else Colors.GREEN}{'🔴 DETECTED' if digital_twin['motion'] == 1 else '⚪ NONE'}{Colors.RESET}")
+    print(f"{Colors.BLUE}💦 Humidity:{Colors.RESET} {Colors.YELLOW}{digital_twin['humidity']:.1f}%{Colors.RESET}")
 
-    print(f"📊 Risk Score: {risk_score}%")
-    print(f"🤖 Status: {status}")
-    print(f"➡ Recommendation: {recommendation}")
-
-    print("-" * 60)
+    print(f"\n{Colors.BOLD}{'─'*60}{Colors.RESET}")
+    print(f"{Colors.BOLD}📊 Risk Score:{Colors.RESET} {get_status_color(status)}{risk_score}%{Colors.RESET}")
+    print(f"{Colors.BOLD}🤖 AI Status:{Colors.RESET} {get_status_color(status)}{status}{Colors.RESET}")
+    print(f"{Colors.BOLD}➡ Recommendation:{Colors.RESET} {Colors.CYAN}{recommendation}{Colors.RESET}")
+    print(f"{Colors.BOLD}{'='*60}{Colors.RESET}\n")
 
 
     # Save to CSV
